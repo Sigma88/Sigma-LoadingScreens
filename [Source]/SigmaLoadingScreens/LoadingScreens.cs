@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -56,23 +57,6 @@ namespace SigmaLoadingScreensPlugin
                 AddScreens(LoadingScreen.Instance?.Screens?.Skip(1)?.FirstOrDefault());
         }
 
-        void LoadModScreens(string mod)
-        {
-            string filePath = "GameData/" + mod + "LoadingScreens/LoadingScreen_";
-
-            for (int i = 1; File.Exists(filePath + i + ".png"); i++)
-            {
-                Texture2D tex = new Texture2D(2, 2);
-                tex.name = mod.Replace("/", "") + "_" + i;
-                byte[] fileData = File.ReadAllBytes(filePath + i + ".png");
-
-                tex.LoadImage(fileData);
-
-                if (tex != null)
-                    newScreens.Add(tex);
-            }
-        }
-
         void AddScreens(LoadingScreen.LoadingScreenState screen)
         {
             List<Object> screens = screen?.screens?.ToList();
@@ -80,6 +64,41 @@ namespace SigmaLoadingScreensPlugin
                 screens = new List<Object>();
             screens.AddRange(newScreens);
             screen.screens = screens.ToArray();
+        }
+
+        void LoadModScreens(string mod)
+        {
+            string filePath = "GameData/" + mod + "LoadingScreens/LoadingScreen_";
+
+            for (int i = 1; File.Exists(filePath + i + ".dds"); i++)
+            {
+                Texture2D tex = new Texture2D(2, 2);
+                tex.name = mod.Replace("/", "") + "_" + i;
+                byte[] fileData = File.ReadAllBytes(filePath + i + ".dds");
+
+                tex = LoadDDS(fileData);
+
+                if (tex != null)
+                    newScreens.Add(tex);
+            }
+        }
+
+        public static Texture2D LoadDDS(byte[] bytes)
+        {
+            if (bytes[4] != 124) return null; //this byte should be 124 for DDS image files
+
+            int height = bytes[13] * 256 + bytes[12];
+            int width = bytes[17] * 256 + bytes[16];
+
+            int header = 128;
+            byte[] data = new byte[bytes.Length - header];
+            Buffer.BlockCopy(bytes, header, data, 0, bytes.Length - header);
+
+            Texture2D texture = new Texture2D(width, height, TextureFormat.DXT5, false);
+            texture.LoadRawTextureData(data);
+            texture.Apply();
+
+            return (texture);
         }
     }
 }
