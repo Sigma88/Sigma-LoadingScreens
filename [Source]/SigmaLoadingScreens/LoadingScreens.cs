@@ -22,7 +22,7 @@ namespace SigmaLoadingScreensPlugin
             AssemblyLoader.LoadedAssembly TheChosenOne = list.FirstOrDefault(a => a.versionMinor == list.Select(i => i.versionMinor).Max());
             if (first && Assembly.GetExecutingAssembly() == TheChosenOne.assembly)
             {
-                Debug.Log("[SigmaLog] Version Check:   Sigma LoadingScreens v" + TheChosenOne.assembly.GetName().Version);
+                Debug.Log(("[SigmaLog] Version Check:   Sigma LoadingScreens v" + TheChosenOne.assembly.GetName().Version).TrimEnd('0').TrimEnd('.'));
                 first = false;
                 DontDestroyOnLoad(this);
             }
@@ -68,18 +68,20 @@ namespace SigmaLoadingScreensPlugin
 
         void LoadModScreens(string mod)
         {
-            string filePath = "GameData/" + mod + "LoadingScreens/LoadingScreen_";
+            string filePath = "GameData/" + mod + "LoadingScreens/PluginData/LoadingScreen_";
 
             for (int i = 1; File.Exists(filePath + i + ".dds"); i++)
             {
                 Texture2D tex = new Texture2D(2, 2);
-                tex.name = mod.Replace("/", "") + "_" + i;
                 byte[] fileData = File.ReadAllBytes(filePath + i + ".dds");
 
                 tex = LoadDDS(fileData);
 
-                if (tex != null)
-                    newScreens.Add(tex);
+                if (tex == null) continue;
+                tex.name = mod.Replace("/", "") + "_" + i;
+
+                newScreens.Add(tex);
+                Debug.Log("[Sigma88Log] LoadingScreens: Added texture " + tex.name);
             }
         }
 
