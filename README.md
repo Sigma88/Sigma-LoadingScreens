@@ -1,8 +1,8 @@
 # Sigma LoadingScreens
 
-**Custom Loading Screens for mods by Sigma88**
+**Custom Loading Screens Mod by Sigma88**
 
-### Supported Mods:
+### Built-in support for:
 
 - Galactic Neighborhood
 - Sigma Binary
