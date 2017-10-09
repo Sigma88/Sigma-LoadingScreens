@@ -12,9 +12,18 @@ namespace SigmaLoadingScreensPlugin
     [KSPAddon(KSPAddon.Startup.Instantly, true)]
     public class LoadingScreens : MonoBehaviour
     {
-        static List<Object> newScreens = new List<Object>();
         static bool first = true;
         static bool skip = false;
+
+        // Loading Screens
+        public static bool removeStockScreens = false;
+        public static List<string> externalMods = new List<string>();
+        public static List<Object> newScreens = new List<Object>();
+
+        // Loading Tips
+        public static bool removeStockTips = false;
+        public static List<string> externalTipFiles = new List<string>();
+        public static List<string> newTips = new List<string>();
 
         void Awake()
         {
@@ -22,7 +31,6 @@ namespace SigmaLoadingScreensPlugin
             AssemblyLoader.LoadedAssembly TheChosenOne = list.FirstOrDefault(a => a.versionMinor == list.Select(i => i.versionMinor).Max());
             if (first && Assembly.GetExecutingAssembly() == TheChosenOne.assembly)
             {
-                Debug.Log(("[SigmaLog] Version Check:   Sigma LoadingScreens v" + TheChosenOne.assembly.GetName().Version).TrimEnd('0').TrimEnd('.'));
                 first = false;
                 DontDestroyOnLoad(this);
             }
@@ -35,6 +43,8 @@ namespace SigmaLoadingScreensPlugin
             if (!skip && LoadingScreen.Instance?.Screens?.Skip(1)?.FirstOrDefault() != null)
             {
                 LoadScreens(AssemblyLoader.loadedAssemblies.Select(a => a.name).ToArray());
+                LoadExternal(GameDatabase.Instance.GetConfigNodes("Sigma88LoadingScreens"));
+                AddScreens(LoadingScreen.Instance?.Screens?.Skip(1)?.FirstOrDefault());
                 skip = true;
             }
 
@@ -47,28 +57,80 @@ namespace SigmaLoadingScreensPlugin
         void LoadScreens(string[] mods)
         {
             if (mods.Contains("GalacticNeighborhood"))
-                LoadModScreens("GalacticNeighborhood/");
+                LoadModScreens("GalacticNeighborhood/LoadingScreens/PluginData/");
             if (mods.Contains("SigmaBinary"))
-                LoadModScreens("Sigma/Binary/");
+                LoadModScreens("Sigma/Binary/LoadingScreens/PluginData/");
             if (mods.Contains("SigmaDimensions"))
-                LoadModScreens("Sigma/Dimensions/");
+                LoadModScreens("Sigma/Dimensions/LoadingScreens/PluginData/");
+        }
 
-            if (newScreens.Count > 0)
-                AddScreens(LoadingScreen.Instance?.Screens?.Skip(1)?.FirstOrDefault());
+        void LoadExternal(ConfigNode[] nodes)
+        {
+            for (int i = 0; i < nodes?.Length; i++)
+            {
+                // Loading Screens
+                string[] folders = nodes[i].GetValues("folder");
+                for (int j = 0; j < folders?.Length; j++)
+                {
+                    LoadModScreens(folders[j]);
+                }
+                if (bool.TryParse(nodes[i].GetValue("removeStockScreens"), out bool clear) && clear)
+                {
+                    removeStockScreens = true;
+                }
+
+                // Loading Tips
+                string[] tipsFiles = nodes[i].GetValues("tipsFile");
+                for (int j = 0; j < tipsFiles?.Length; j++)
+                {
+                    LoadModTips(tipsFiles[j]);
+                }
+                if (bool.TryParse(nodes[i].GetValue("removeStockTips"), out clear) && clear)
+                {
+                    removeStockTips = true;
+                }
+            }
         }
 
         void AddScreens(LoadingScreen.LoadingScreenState screen)
         {
+            // Loading Screens
             List<Object> screens = screen?.screens?.ToList();
             if (screens == null)
                 screens = new List<Object>();
+
+            if (removeStockScreens)
+                screens.Clear();
+
             screens.AddRange(newScreens);
+            if (screens.Count == 0)
+            {
+                Texture2D black = new Texture2D(1, 1);
+                black.SetPixel(1, 1, Color.black);
+                black.Apply();
+                screens.Add(black);
+            }
+
             screen.screens = screens.ToArray();
+
+            // Loading Tips
+            List<string> tips = screen?.tips?.ToList();
+            if (tips == null)
+                tips = new List<string>();
+
+            if (removeStockTips)
+                tips.Clear();
+
+            tips.AddRange(newTips);
+            if (tips.Count == 0)
+                tips.Add(" ");
+
+            screen.tips = tips.ToArray();
         }
 
         void LoadModScreens(string mod)
         {
-            string filePath = "GameData/" + mod + "LoadingScreens/PluginData/LoadingScreen_";
+            string filePath = "GameData/" + mod + "LoadingScreen_";
 
             for (int i = 1; File.Exists(filePath + i + ".dds"); i++)
             {
@@ -78,10 +140,17 @@ namespace SigmaLoadingScreensPlugin
                 tex = LoadDDS(fileData);
 
                 if (tex == null) continue;
-                tex.name = mod.Replace("/", "") + "_" + i;
+                tex.name = filePath.Substring(9);
 
                 newScreens.Add(tex);
-                Debug.Log("[Sigma88Log] LoadingScreens: Added texture " + tex.name);
+            }
+        }
+
+        void LoadModTips(string path)
+        {
+            if (File.Exists("GameData/" + path))
+            {
+                newTips.AddRange(File.ReadAllLines("GameData/" + path).Where(s => !string.IsNullOrEmpty(s)));
             }
         }
 
