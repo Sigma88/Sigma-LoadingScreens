@@ -54,7 +54,6 @@ namespace Sigma88LoadingScreensPlugin
                 LoadingScreens.LoadBuiltIn(AssemblyLoader.loadedAssemblies.Select(a => a.name).ToArray());
                 LoadingScreens.LoadExternal(GameDatabase.Instance.GetConfigNodes("Sigma88LoadingScreens"));
                 LoadingScreens.AddScreens(LoadingScreen.Instance?.Screens?.Skip(1)?.FirstOrDefault());
-                LoadingScreen.Instance.Screens.Skip(1).FirstOrDefault().displayTime /= 10;
             }
 
             if (themes?.Count() > 0 && LoadingScreen.Instance?.Screens?.Skip(logos?.Count > 0 ? 2 : 1)?.FirstOrDefault()?.activeScreen != null)
