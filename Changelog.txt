@@ -1,3 +1,15 @@
+**v0.3.0**
+
+- Added some changes to allow customization via config file
+- Added compatibility with .dds (DTX1 RGB) images
+- Added KSP-AVC compatibility
+
+
+**v0.2.0**
+
+- Use .dds (DTX5 RGBA) images rather than .png
+
+
 **v0.1.0**
 
 - First Beta Version

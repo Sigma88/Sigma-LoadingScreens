@@ -15,15 +15,16 @@ namespace Sigma88LoadingScreensPlugin
 
         // Loading Screens
         public static bool removeStockScreens = false;
-        public static Texture2D logoScreen = null;
         public static List<string> externalMods = new List<string>();
         public static List<Object> newScreens = new List<Object>();
 
         // Loading Tips
         public static bool removeStockTips = false;
-        public static string logoTip = "";
         public static List<string> externalTipFiles = new List<string>();
         public static List<string> newTips = new List<string>();
+
+        // Logo
+        public static List<KeyValuePair<Texture2D, string>> logos = new List<KeyValuePair<Texture2D, string>>();
 
         void Awake()
         {
@@ -35,7 +36,9 @@ namespace Sigma88LoadingScreensPlugin
                 DontDestroyOnLoad(this);
             }
             else
+            {
                 DestroyImmediate(this);
+            }
         }
 
         void Update()
