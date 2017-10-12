@@ -11,19 +11,24 @@ namespace Sigma88LoadingScreensPlugin
     {
         internal static void LoadBuiltIn(string[] mods)
         {
+            if (LoadingScreenSettings.newScreens == null)
+                LoadingScreenSettings.newScreens = new List<Object>();
+            if (LoadingScreenSettings.newTips == null)
+                LoadingScreenSettings.newTips = new List<string>();
+
             if (mods.Contains("GalacticNeighborhood"))
             {
-                LoadScreens("GalacticNeighborhood/LoadingScreens/PluginData/");
+                LoadingScreenSettings.newScreens.AddRange(LoadScreens("GalacticNeighborhood/LoadingScreens/PluginData/"));
                 LoadingScreenSettings.newTips.Add("Populating Star Systems...");
             }
             if (mods.Contains("SigmaBinary"))
             {
-                LoadScreens("Sigma/Binary/LoadingScreens/PluginData/");
+                LoadingScreenSettings.newScreens.AddRange(LoadScreens("Sigma/Binary/LoadingScreens/PluginData/"));
                 LoadingScreenSettings.newTips.Add("Re-centering Barycenters...");
             }
             if (mods.Contains("SigmaDimensions"))
             {
-                LoadScreens("Sigma/Dimensions/LoadingScreens/PluginData/");
+                LoadingScreenSettings.newScreens.AddRange(LoadScreens("Sigma/Dimensions/LoadingScreens/PluginData/"));
                 LoadingScreenSettings.newTips.Add("Scrambling Universal Constants...");
             }
         }
@@ -32,27 +37,53 @@ namespace Sigma88LoadingScreensPlugin
         {
             for (int i = 0; i < nodes?.Length; i++)
             {
+                List<Object> screens = new List<Object>();
+                List<string> tips = new List<string>();
+
+
                 // Loading Screens
                 string[] folders = nodes[i].GetValues("folder");
                 for (int j = 0; j < folders?.Length; j++)
                 {
-                    LoadScreens(folders[j]);
+                    screens.AddRange(LoadScreens(folders[j]));
                 }
                 if (bool.TryParse(nodes[i].GetValue("removeStockScreens"), out bool clear) && clear)
                 {
                     LoadingScreenSettings.removeStockScreens = true;
                 }
+                LoadingScreenSettings.newScreens.AddRange(screens);
+
 
                 // Loading Tips
                 string[] tipsFiles = nodes[i].GetValues("tipsFile");
                 for (int j = 0; j < tipsFiles?.Length; j++)
                 {
-                    LoadTips(tipsFiles[j]);
+                    tips.AddRange(LoadTips(tipsFiles[j]));
                 }
                 if (bool.TryParse(nodes[i].GetValue("removeStockTips"), out clear) && clear)
                 {
                     LoadingScreenSettings.removeStockTips = true;
                 }
+                
+
+                // Theme
+                if (bool.TryParse(nodes[i].GetValue("themedTips"), out bool themed) && themed && screens?.Count() > 0 && tips?.Count() > 0)
+                {
+                    if (LoadingScreenSettings.themes == null)
+                        LoadingScreenSettings.themes = new List<KeyValuePair<Object[], string[]>>();
+                    LoadingScreenSettings.themes.Add(new KeyValuePair<Object[], string[]>(screens.ToArray(), tips.ToArray()));
+                }
+                else
+                {
+                    if (LoadingScreenSettings.newScreens == null)
+                        LoadingScreenSettings.newScreens = new List<Object>();
+                    LoadingScreenSettings.newScreens.AddRange(screens);
+
+                    if (LoadingScreenSettings.newTips == null)
+                        LoadingScreenSettings.newTips = new List<string>();
+                    LoadingScreenSettings.newTips.AddRange(tips);
+                }
+
 
                 // Logo
                 if (nodes[i].HasValue("logoScreen"))
@@ -76,23 +107,21 @@ namespace Sigma88LoadingScreensPlugin
                 screens.Clear();
 
             screens.AddRange(LoadingScreenSettings.newScreens);
-            screens.Add(Utility.LoadDDS(Resources.SigmaLSLS_1));
-
+            screens.Add(Resources.SigmaLSLS_1);
+            screens.Scramble();
             screen.screens = screens.ToArray();
 
 
             // Loading Tips
-            List<string> tips = screen?.tips?.ToList();
-            if (tips == null)
-                tips = new List<string>();
+            if (LoadingScreenSettings.newTips == null)
+                LoadingScreenSettings.newTips = new List<string>();
 
-            if (LoadingScreenSettings.removeStockTips)
-                tips.Clear();
+            if (!LoadingScreenSettings.removeStockTips && screen.tips?.Length > 0)
+                LoadingScreenSettings.newTips.InsertRange(0, screen.tips);
 
-            tips.AddRange(LoadingScreenSettings.newTips);
-            tips.Add("Hacking Loading Screen...");
+            LoadingScreenSettings.newTips.Add("Hacking Loading Screen...");
 
-            screen.tips = tips.ToArray();
+            screen.tips = LoadingScreenSettings.newTips.ToArray();
 
 
             // Logo
@@ -119,8 +148,10 @@ namespace Sigma88LoadingScreensPlugin
                 LoadingScreenSettings.logos.Add(new KeyValuePair<Texture2D, string>(logoScreen, string.IsNullOrEmpty(logoTip) ? "Loading..." : logoTip));
         }
 
-        static void LoadScreens(string path)
+        static Object[] LoadScreens(string path)
         {
+            List<Object> list = new List<Object>();
+
             var files = Directory.GetFiles("GameData/" + path)?.Where(f => Path.GetExtension(f) == ".dds")?.ToArray();
 
             for (int i = 0; i < files?.Length; i++)
@@ -135,16 +166,17 @@ namespace Sigma88LoadingScreensPlugin
                 if (tex == null) continue;
                 tex.name = path + Path.GetFileNameWithoutExtension(filePath);
 
-                LoadingScreenSettings.newScreens.Add(tex);
+                list.Add(tex);
             }
+
+            return list?.Count > 0 ? list.ToArray() : new Object[] { };
         }
 
-        static void LoadTips(string path)
+        static string[] LoadTips(string path)
         {
-            if (File.Exists("GameData/" + path))
-            {
-                LoadingScreenSettings.newTips.AddRange(File.ReadAllLines("GameData/" + path).Where(s => !string.IsNullOrEmpty(s)));
-            }
+            string[] tips = null;
+            try { tips = File.ReadAllLines("GameData/" + path).Where(s => !string.IsNullOrEmpty(s)).ToArray(); } catch { }
+            return tips?.Length > 0 ? tips : new string[] { };
         }
     }
 }

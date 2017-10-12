@@ -26,6 +26,9 @@ namespace Sigma88LoadingScreensPlugin
         // Logo
         public static List<KeyValuePair<Texture2D, string>> logos = new List<KeyValuePair<Texture2D, string>>();
 
+        // Themes
+        public static List<KeyValuePair<Object[], string[]>> themes = new List<KeyValuePair<Object[], string[]>>();
+
         void Awake()
         {
             AssemblyLoader.LoadedAssembly[] list = AssemblyLoader.loadedAssemblies.Where(a => a.name == "Sigma88LoadingScreens").ToArray();
@@ -49,6 +52,13 @@ namespace Sigma88LoadingScreensPlugin
                 LoadingScreens.LoadBuiltIn(AssemblyLoader.loadedAssemblies.Select(a => a.name).ToArray());
                 LoadingScreens.LoadExternal(GameDatabase.Instance.GetConfigNodes("Sigma88LoadingScreens"));
                 LoadingScreens.AddScreens(LoadingScreen.Instance?.Screens?.Skip(1)?.FirstOrDefault());
+            }
+
+            if (themes?.Count() > 0 && LoadingScreen.Instance?.Screens?.Skip(logos?.Count > 0 ? 2 : 1)?.FirstOrDefault() != null)
+            {
+                LoadingScreen.LoadingScreenState screen = LoadingScreen.Instance.Screens.Skip(logos?.Count > 0 ? 2 : 1).FirstOrDefault();
+                string[] tips = themes.FirstOrDefault(t => t.Key?.Contains(screen?.activeScreen) == true).Value;
+                screen.tips = tips ?? newTips.ToArray();
             }
 
             if (HighLogic.LoadedScene == GameScenes.MAINMENU)
