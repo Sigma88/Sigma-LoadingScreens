@@ -12,11 +12,20 @@ namespace Sigma88LoadingScreensPlugin
         internal static void LoadBuiltIn(string[] mods)
         {
             if (mods.Contains("GalacticNeighborhood"))
+            {
                 LoadScreens("GalacticNeighborhood/LoadingScreens/PluginData/");
+                LoadingScreenSettings.newTips.Add("Populating Star Systems...");
+            }
             if (mods.Contains("SigmaBinary"))
+            {
                 LoadScreens("Sigma/Binary/LoadingScreens/PluginData/");
+                LoadingScreenSettings.newTips.Add("Re-centering Barycenters...");
+            }
             if (mods.Contains("SigmaDimensions"))
+            {
                 LoadScreens("Sigma/Dimensions/LoadingScreens/PluginData/");
+                LoadingScreenSettings.newTips.Add("Scrambling Universal Constants...");
+            }
         }
 
         internal static void LoadExternal(ConfigNode[] nodes)
