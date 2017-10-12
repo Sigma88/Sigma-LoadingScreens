@@ -27,6 +27,8 @@ namespace Sigma88LoadingScreensPlugin
         public static List<KeyValuePair<Texture2D, string>> logos = new List<KeyValuePair<Texture2D, string>>();
 
         // Themes
+        static int? lastTheme = null;
+        static Object lastScreen = null;
         public static List<KeyValuePair<Object[], string[]>> themes = new List<KeyValuePair<Object[], string[]>>();
 
         void Awake()
@@ -52,13 +54,27 @@ namespace Sigma88LoadingScreensPlugin
                 LoadingScreens.LoadBuiltIn(AssemblyLoader.loadedAssemblies.Select(a => a.name).ToArray());
                 LoadingScreens.LoadExternal(GameDatabase.Instance.GetConfigNodes("Sigma88LoadingScreens"));
                 LoadingScreens.AddScreens(LoadingScreen.Instance?.Screens?.Skip(1)?.FirstOrDefault());
+                LoadingScreen.Instance.Screens.Skip(1).FirstOrDefault().displayTime /= 10;
             }
 
-            if (themes?.Count() > 0 && LoadingScreen.Instance?.Screens?.Skip(logos?.Count > 0 ? 2 : 1)?.FirstOrDefault() != null)
+            if (themes?.Count() > 0 && LoadingScreen.Instance?.Screens?.Skip(logos?.Count > 0 ? 2 : 1)?.FirstOrDefault()?.activeScreen != null)
             {
                 LoadingScreen.LoadingScreenState screen = LoadingScreen.Instance.Screens.Skip(logos?.Count > 0 ? 2 : 1).FirstOrDefault();
-                string[] tips = themes.FirstOrDefault(t => t.Key?.Contains(screen?.activeScreen) == true).Value;
-                screen.tips = tips ?? newTips.ToArray();
+
+                if (lastScreen != screen.activeScreen)
+                {
+                    lastScreen = screen.activeScreen;
+
+                    int? theme = null;
+                    try { theme = themes.FindIndex(t => t.Key?.Contains(screen?.activeScreen) == true); } catch { }
+
+                    if (lastTheme != theme)
+                    {
+                        lastTheme = theme;
+                        screen.tips = theme == null ? newTips.ToArray() : themes[(int)theme].Value;
+                        LoadingScreen.Instance.SetTip(screen);
+                    }
+                }
             }
 
             if (HighLogic.LoadedScene == GameScenes.MAINMENU)
