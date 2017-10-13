@@ -38,6 +38,7 @@ namespace Sigma88LoadingScreensPlugin
             TheChosenOne = list.FirstOrDefault(a => a.assembly.GetName().Version.Minor == list.Select(i => i.assembly.GetName().Version.Minor).Max());
             if (first && Assembly.GetExecutingAssembly() == TheChosenOne.assembly)
             {
+                Version.Print();
                 first = false;
                 DontDestroyOnLoad(this);
             }
