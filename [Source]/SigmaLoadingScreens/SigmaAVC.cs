@@ -1,32 +1,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using UnityEngine;
 using KSP_AVC;
 
 
 namespace Sigma88LoadingScreensPlugin
 {
-    [KSPAddon(KSPAddon.Startup.Instantly, true)]
-    public class SigmaAVC : MonoBehaviour
+    internal static class SigmaAVC
     {
-        static bool skip = false;
-
-        void Awake()
+        internal static bool skip = false;
+        
+        internal static void ADD()
         {
-            if (AssemblyLoader.loadedAssemblies.FirstOrDefault(a => a.name == "KSP-AVC") != null)
-            {
-                DontDestroyOnLoad(this);
-            }
-            else
-            {
-                DestroyImmediate(this);
-            }
-        }
-
-        void Update()
-        {
-            if (AddonLibrary.Populated && !skip)
+            if (AddonLibrary.Populated)
             {
                 skip = true;
                 try
@@ -41,7 +27,6 @@ namespace Sigma88LoadingScreensPlugin
                 catch
                 {
                 }
-                DestroyImmediate(this);
             }
         }
     }

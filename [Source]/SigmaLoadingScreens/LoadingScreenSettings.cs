@@ -10,6 +10,7 @@ namespace Sigma88LoadingScreensPlugin
     [KSPAddon(KSPAddon.Startup.Instantly, true)]
     public class LoadingScreenSettings : MonoBehaviour
     {
+        internal static AssemblyLoader.LoadedAssembly TheChosenOne = null;
         static bool first = true;
         static bool skip = false;
 
@@ -34,7 +35,7 @@ namespace Sigma88LoadingScreensPlugin
         void Awake()
         {
             AssemblyLoader.LoadedAssembly[] list = AssemblyLoader.loadedAssemblies.Where(a => a.name == "Sigma88LoadingScreens").ToArray();
-            AssemblyLoader.LoadedAssembly TheChosenOne = list.FirstOrDefault(a => a.versionMinor == list.Select(i => i.versionMinor).Max());
+            TheChosenOne = list.FirstOrDefault(a => a.assembly.GetName().Version.Minor == list.Select(i => i.assembly.GetName().Version.Minor).Max());
             if (first && Assembly.GetExecutingAssembly() == TheChosenOne.assembly)
             {
                 first = false;
@@ -75,6 +76,9 @@ namespace Sigma88LoadingScreensPlugin
                     }
                 }
             }
+
+            if (!SigmaAVC.skip)
+                SigmaAVC.ADD();
 
             if (HighLogic.LoadedScene == GameScenes.MAINMENU)
             {
