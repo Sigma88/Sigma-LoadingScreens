@@ -1,4 +1,5 @@
 ﻿using System.Resources;
+using UnityEngine;
 
 
 namespace Sigma88LoadingScreensPlugin
@@ -24,12 +25,13 @@ namespace Sigma88LoadingScreensPlugin
             }
         }
 
-        internal static byte[] SigmaLSLS_1
+        internal static Texture2D SigmaLSLS_1
         {
             get
             {
-                object obj = ResourceManager.GetObject("SigmaLSLS_1");
-                return ((byte[])(obj));
+                Texture2D tex = Utility.LoadDDS((byte[])(ResourceManager.GetObject("SigmaLSLS_1")));
+                tex.name = "SigmaLSLS_1";
+                return tex;
             }
         }
     }

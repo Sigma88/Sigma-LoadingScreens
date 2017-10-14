@@ -11,52 +11,87 @@ namespace Sigma88LoadingScreensPlugin
     {
         internal static void LoadBuiltIn(string[] mods)
         {
+            if (LoadingScreenSettings.newScreens == null)
+                LoadingScreenSettings.newScreens = new List<Object>();
+            if (LoadingScreenSettings.newTips == null)
+                LoadingScreenSettings.newTips = new List<string>();
+
             if (mods.Contains("GalacticNeighborhood"))
-                LoadScreens("GalacticNeighborhood/LoadingScreens/PluginData/");
+            {
+                LoadingScreenSettings.newScreens.AddRange(LoadScreens("GalacticNeighborhood/LoadingScreens/PluginData/"));
+                LoadingScreenSettings.newTips.Add("Populating Star Systems...");
+            }
             if (mods.Contains("SigmaBinary"))
-                LoadScreens("Sigma/Binary/LoadingScreens/PluginData/");
+            {
+                LoadingScreenSettings.newScreens.AddRange(LoadScreens("Sigma/Binary/LoadingScreens/PluginData/"));
+                LoadingScreenSettings.newTips.Add("Re-centering Barycenters...");
+            }
             if (mods.Contains("SigmaDimensions"))
-                LoadScreens("Sigma/Dimensions/LoadingScreens/PluginData/");
+            {
+                LoadingScreenSettings.newScreens.AddRange(LoadScreens("Sigma/Dimensions/LoadingScreens/PluginData/"));
+                LoadingScreenSettings.newTips.Add("Scrambling Universal Constants...");
+            }
         }
 
         internal static void LoadExternal(ConfigNode[] nodes)
         {
             for (int i = 0; i < nodes?.Length; i++)
             {
+                List<Object> screens = new List<Object>();
+                List<string> tips = new List<string>();
+
+
                 // Loading Screens
                 string[] folders = nodes[i].GetValues("folder");
                 for (int j = 0; j < folders?.Length; j++)
                 {
-                    LoadScreens(folders[j]);
+                    screens.AddRange(LoadScreens(folders[j]));
                 }
                 if (bool.TryParse(nodes[i].GetValue("removeStockScreens"), out bool clear) && clear)
                 {
                     LoadingScreenSettings.removeStockScreens = true;
                 }
+                LoadingScreenSettings.newScreens.AddRange(screens);
+
 
                 // Loading Tips
                 string[] tipsFiles = nodes[i].GetValues("tipsFile");
                 for (int j = 0; j < tipsFiles?.Length; j++)
                 {
-                    LoadTips(tipsFiles[j]);
+                    tips.AddRange(LoadTips(tipsFiles[j]));
                 }
                 if (bool.TryParse(nodes[i].GetValue("removeStockTips"), out clear) && clear)
                 {
                     LoadingScreenSettings.removeStockTips = true;
                 }
+                
+
+                // Theme
+                if (bool.TryParse(nodes[i].GetValue("themedTips"), out bool themed) && themed && screens?.Count() > 0 && tips?.Count() > 0)
+                {
+                    if (LoadingScreenSettings.themes == null)
+                        LoadingScreenSettings.themes = new List<KeyValuePair<Object[], string[]>>();
+                    LoadingScreenSettings.themes.Add(new KeyValuePair<Object[], string[]>(screens.ToArray(), tips.ToArray()));
+                }
+                else
+                {
+                    if (LoadingScreenSettings.newScreens == null)
+                        LoadingScreenSettings.newScreens = new List<Object>();
+                    LoadingScreenSettings.newScreens.AddRange(screens);
+
+                    if (LoadingScreenSettings.newTips == null)
+                        LoadingScreenSettings.newTips = new List<string>();
+                    LoadingScreenSettings.newTips.AddRange(tips);
+                }
+
 
                 // Logo
-                if (LoadingScreenSettings.logoScreen == null && nodes[i].HasValue("logoScreen"))
+                if (nodes[i].HasValue("logoScreen"))
                 {
                     string path = "GameData/" + nodes[i].GetValue("logoScreen");
 
                     if (File.Exists(path))
-                        LoadingScreenSettings.logoScreen = Utility.LoadDDS(File.ReadAllBytes(path));
-
-                    if (nodes[i].HasValue("logoTip"))
-                        LoadingScreenSettings.logoTip = nodes[i].GetValue("logoTip");
-                    else
-                        LoadingScreenSettings.logoTip = "Loading...";
+                        AddLogo(Utility.LoadDDS(File.ReadAllBytes(path)), nodes[i].GetValue("logoTip"));
                 }
             }
         }
@@ -72,32 +107,34 @@ namespace Sigma88LoadingScreensPlugin
                 screens.Clear();
 
             screens.AddRange(LoadingScreenSettings.newScreens);
-            screens.Add(Utility.LoadDDS(Resources.SigmaLSLS_1));
-
+            screens.Add(Resources.SigmaLSLS_1);
+            screens.Scramble();
             screen.screens = screens.ToArray();
 
 
             // Loading Tips
-            List<string> tips = screen?.tips?.ToList();
-            if (tips == null)
-                tips = new List<string>();
+            if (LoadingScreenSettings.newTips == null)
+                LoadingScreenSettings.newTips = new List<string>();
 
-            if (LoadingScreenSettings.removeStockTips)
-                tips.Clear();
+            if (!LoadingScreenSettings.removeStockTips && screen.tips?.Length > 0)
+                LoadingScreenSettings.newTips.InsertRange(0, screen.tips);
 
-            tips.AddRange(LoadingScreenSettings.newTips);
-            tips.Add("Hacking Loading Screen...");
+            LoadingScreenSettings.newTips.Add("Hacking Loading Screen...");
 
-            screen.tips = tips.ToArray();
+            screen.tips = LoadingScreenSettings.newTips.ToArray();
 
 
             // Logo
-            if (LoadingScreenSettings.logoScreen != null)
+            if (LoadingScreenSettings.logos?.Count > 0)
             {
                 LoadingScreen.LoadingScreenState logo = new LoadingScreen.LoadingScreenState();
                 Utility.Clone(LoadingScreen.Instance.Screens.FirstOrDefault(), logo);
-                logo.screens = new Object[] { LoadingScreenSettings.logoScreen };
-                logo.tips = new string[] { LoadingScreenSettings.logoTip };
+
+                System.Random rnd = new System.Random();
+                KeyValuePair<Texture2D, string> randomLogo = LoadingScreenSettings.logos[rnd.Next(LoadingScreenSettings.logos.Count)];
+
+                logo.screens = new Object[] { randomLogo.Key };
+                logo.tips = new string[] { randomLogo.Value };
 
                 List<LoadingScreen.LoadingScreenState> Screens = LoadingScreen.Instance.Screens;
                 Screens.Insert(1, logo);
@@ -105,30 +142,41 @@ namespace Sigma88LoadingScreensPlugin
             }
         }
 
-        static void LoadScreens(string path)
+        static void AddLogo(Texture2D logoScreen, string logoTip)
         {
-            string filePath = "GameData/" + path + "LoadingScreen_";
+            if (logoScreen != null)
+                LoadingScreenSettings.logos.Add(new KeyValuePair<Texture2D, string>(logoScreen, string.IsNullOrEmpty(logoTip) ? "Loading..." : logoTip));
+        }
 
-            for (int i = 1; File.Exists(filePath + i + ".dds"); i++)
+        static Object[] LoadScreens(string path)
+        {
+            List<Object> list = new List<Object>();
+
+            var files = Directory.GetFiles("GameData/" + path)?.Where(f => Path.GetExtension(f) == ".dds")?.ToArray();
+
+            for (int i = 0; i < files?.Length; i++)
             {
+                string filePath = files[i];
+
                 Texture2D tex = new Texture2D(2, 2);
-                byte[] fileData = File.ReadAllBytes(filePath + i + ".dds");
+                byte[] fileData = File.ReadAllBytes(filePath);
 
                 tex = Utility.LoadDDS(fileData);
 
                 if (tex == null) continue;
-                tex.name = filePath.Substring(9) + i;
+                tex.name = path + Path.GetFileNameWithoutExtension(filePath);
 
-                LoadingScreenSettings.newScreens.Add(tex);
+                list.Add(tex);
             }
+
+            return list?.Count > 0 ? list.ToArray() : new Object[] { };
         }
 
-        static void LoadTips(string path)
+        static string[] LoadTips(string path)
         {
-            if (File.Exists("GameData/" + path))
-            {
-                LoadingScreenSettings.newTips.AddRange(File.ReadAllLines("GameData/" + path).Where(s => !string.IsNullOrEmpty(s)));
-            }
+            string[] tips = null;
+            try { tips = File.ReadAllLines("GameData/" + path).Where(s => !string.IsNullOrEmpty(s)).ToArray(); } catch { }
+            return tips?.Length > 0 ? tips : new string[] { };
         }
     }
 }

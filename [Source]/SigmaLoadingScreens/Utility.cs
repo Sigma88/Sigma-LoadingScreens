@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 
@@ -53,6 +54,26 @@ namespace Sigma88LoadingScreensPlugin
                 copy.fadeInTime = original.fadeInTime;
                 copy.fadeOutTime = original.fadeOutTime;
                 copy.tipTime = original.tipTime;
+            }
+        }
+
+        public static void Scramble<T>(this List<T> list)
+        {
+            if (list?.Count > 0)
+            {
+                System.Random rnd = new System.Random();
+                List<T> oldList = new List<T>();
+                oldList.AddRange(list);
+                list.Clear();
+
+                int count = oldList.Count;
+
+                for (int i = 0; i < count; i++)
+                {
+                    int index = rnd.Next(oldList.Count);
+                    list.Add(oldList[index]);
+                    oldList.RemoveAt(index);
+                }
             }
         }
     }
