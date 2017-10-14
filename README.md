@@ -69,7 +69,7 @@ These nodes cannot be edited using
     ```
     This specifies the file where the loading screens tips are stored.
     
-    Each non-empty line of text will be loaded as one "tip".
+    Each non-empty line of text inside the file will be loaded as one "tip".
     
     You can have as many "tipsFile" lines in each node. All will be loaded.
     ```
