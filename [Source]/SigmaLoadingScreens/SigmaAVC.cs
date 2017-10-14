@@ -12,6 +12,11 @@ namespace Sigma88LoadingScreensPlugin
         
         internal static void ADD()
         {
+            if (AssemblyLoader.loadedAssemblies.FirstOrDefault(a => a.name == "KSP-AVC") == null)
+            {
+                skip = true;
+                return;
+            }
             if (AddonLibrary.Populated)
             {
                 skip = true;
