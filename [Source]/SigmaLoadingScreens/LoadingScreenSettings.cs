@@ -35,13 +35,11 @@ namespace Sigma88LoadingScreensPlugin
         static Object lastScreen = null;
         public static List<KeyValuePair<Object[], string[]>> themes = new List<KeyValuePair<Object[], string[]>>();
 
-        // SigmaAVC
-        internal static bool skipAVC = false;
-
         void Awake()
         {
             AssemblyLoader.LoadedAssembly[] list = AssemblyLoader.loadedAssemblies.Where(a => a.name == "Sigma88LoadingScreens").ToArray();
             TheChosenOne = list.FirstOrDefault(a => a.assembly.GetName().Version == list.Select(i => i.assembly.GetName().Version).Max());
+            UnityEngine.Debug.Log("SigmaLog: CHOSENTHEONE");
             if (first && Assembly.GetExecutingAssembly() == TheChosenOne.assembly)
             {
                 Version.Print();
