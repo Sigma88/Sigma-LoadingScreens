@@ -40,6 +40,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="SigmaAVC.cs" />
+    <Compile Include="SigmaDebugLogger.cs" />
     <Compile Include="Utility.cs" />
     <Compile Include="Version.cs" />
   </ItemGroup>
