@@ -1,7 +1,4 @@
-﻿using UnityEngine;
-
-
-namespace Sigma88LoadingScreensPlugin
+﻿namespace Sigma88LoadingScreensPlugin
 {
     public static class Version
     {
@@ -15,7 +12,7 @@ namespace Sigma88LoadingScreensPlugin
 
         internal static void Print()
         {
-            Debug.Log("[SigmaLog] Version Check:   Sigma LoadingScreens v" + number?.ToString()?.TrimEnd('0')?.TrimEnd('.'));
+            UnityEngine.Debug.Log("[SigmaLog] Version Check:   Sigma LoadingScreens v" + number?.ToString()?.TrimEnd('0')?.TrimEnd('.'));
         }
     }
 }
