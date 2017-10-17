@@ -1,3 +1,9 @@
+**v0.3.1**
+
+- Fixed KSP-AVC compatibility
+- Improved debugging tools
+
+
 **v0.3.0**
 
 - Added some changes to allow customization via config file
