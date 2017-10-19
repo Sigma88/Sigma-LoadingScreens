@@ -39,7 +39,6 @@ namespace Sigma88LoadingScreensPlugin
         {
             AssemblyLoader.LoadedAssembly[] list = AssemblyLoader.loadedAssemblies.Where(a => a.name == "Sigma88LoadingScreens").ToArray();
             TheChosenOne = list.FirstOrDefault(a => a.assembly.GetName().Version == list.Select(i => i.assembly.GetName().Version).Max());
-            UnityEngine.Debug.Log("SigmaLog: CHOSENTHEONE");
             if (first && Assembly.GetExecutingAssembly() == TheChosenOne.assembly)
             {
                 Version.Print();
