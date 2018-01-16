@@ -233,7 +233,7 @@ namespace Sigma88LoadingScreensPlugin
         {
             Debug.Log("LoadTips", "Loading tips from file = " + path);
 
-            if (!File.Exists(path))
+            if (!File.Exists("GameData/" + path))
             {
                 Debug.Log("LoadTips", "Path does not exist"); return new string[] { };
             }
