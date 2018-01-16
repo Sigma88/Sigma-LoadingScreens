@@ -3,7 +3,7 @@
 **Custom Loading Screens Mod by Sigma88**
 
 
-KSP Forum Thread: http://forum.kerbalspaceprogram.com/index.php?/topic/166521-0/
+To get support: https://github.com/Sigma88/Sigma-LoadingScreens/issues
 
 Latest Release: https://github.com/Sigma88/Sigma-LoadingScreens/releases/latest
 

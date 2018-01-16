@@ -16,7 +16,7 @@ namespace Sigma88LoadingScreensPlugin
 
         void Awake()
         {
-            if (first && AssemblyLoader.loadedAssemblies.FirstOrDefault(a => a.name == "KSP-AVC") != null)
+            if (first && Assembly.GetExecutingAssembly() == LoadingScreenSettings.TheChosenOne.assembly)
             {
                 first = false;
                 DontDestroyOnLoad(this);
