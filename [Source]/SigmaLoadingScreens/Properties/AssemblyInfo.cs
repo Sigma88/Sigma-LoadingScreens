@@ -9,4 +9,4 @@
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: KSPAssembly("Sigma88LoadingScreens", 1, 0)]
-[assembly: AssemblyVersion("0.3.2")]
+[assembly: AssemblyVersion("0.3.3")]
