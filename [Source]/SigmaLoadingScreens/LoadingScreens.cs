@@ -130,7 +130,6 @@ namespace Sigma88LoadingScreensPlugin
             }
 
             screens.AddRange(LoadingScreenSettings.newScreens);
-            screens.Add(Resources.SigmaLSLS_1);
             screens.Scramble();
             screen.screens = screens.ToArray();
             Debug.Log("AddScreens", "Final count of Loading Screen Images = " + screen.screens.Length);
@@ -173,7 +172,7 @@ namespace Sigma88LoadingScreensPlugin
                 Debug.Log("AddScreens", "Chosen logoTip = " + randomLogo.Value);
 
                 List<LoadingScreen.LoadingScreenState> Screens = LoadingScreen.Instance.Screens;
-                Screens.Insert(1, logo);
+                Screens.Insert(LoadingScreen.Instance.Screens.Count - 1, logo);
                 LoadingScreen.Instance.Screens = Screens;
             }
         }
