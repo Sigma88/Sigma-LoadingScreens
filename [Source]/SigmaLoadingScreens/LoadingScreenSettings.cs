@@ -57,17 +57,14 @@ namespace Sigma88LoadingScreensPlugin
 
             for (int i = 0; i < SettingsNodes?.Length; i++)
             {
-                if (bool.TryParse(SettingsNodes[i].config.GetValue("removeStockScreens"), out bool debug) && debug)
-                {
-                    Debug.debug = true;
-                    return;
-                }
+                bool.TryParse(SettingsNodes[i].config.GetValue("debug"), out Debug.debug);
+                if (Debug.debug) return;
             }
         }
 
         void Update()
         {
-            if (!skip && LoadingScreen.Instance?.Screens?.Skip(1)?.FirstOrDefault() != null)
+            if (!skip && LoadingScreen.Instance?.Screens?.LastOrDefault() != null)
             {
                 skip = true;
                 Debug.Log("Settings", "Loaded assembly location = " + Assembly.GetExecutingAssembly().Location);
@@ -76,12 +73,20 @@ namespace Sigma88LoadingScreensPlugin
                 Debug.Log("Settings", "Checking for External mods...");
                 LoadingScreens.LoadExternal(SettingsNodes);
                 Debug.Log("Settings", "Applying Settings to LoadingScreen");
-                LoadingScreens.AddScreens(LoadingScreen.Instance?.Screens?.Skip(1)?.FirstOrDefault());
+                LoadingScreens.AddScreens(LoadingScreen.Instance?.Screens?.LastOrDefault());
+
+                for (int i = 0; i < 3; i++)
+                {
+                    if (LoadingScreen.Instance?.Screens?.ElementAt(i) != null)
+                    {
+                        LoadingScreen.Instance.Screens.ElementAt(i).displayTime = 0.8f;
+                    }
+                }
             }
 
-            if (themes?.Count() > 0 && LoadingScreen.Instance?.Screens?.Skip(logos?.Count > 0 ? 2 : 1)?.FirstOrDefault()?.activeScreen != null)
+            if (themes?.Count() > 0 && LoadingScreen.Instance?.Screens?.ElementAt(logos?.Count > 0 ? LoadingScreen.Instance.Screens.Count - 1 : LoadingScreen.Instance.Screens.Count - 2)?.activeScreen != null)
             {
-                LoadingScreen.LoadingScreenState screen = LoadingScreen.Instance.Screens.Skip(logos?.Count > 0 ? 2 : 1).FirstOrDefault();
+                LoadingScreen.LoadingScreenState screen = LoadingScreen.Instance.Screens.ElementAt(logos?.Count > 0 ? LoadingScreen.Instance.Screens.Count - 1 : LoadingScreen.Instance.Screens.Count - 2);
 
                 if (lastScreen != screen.activeScreen)
                 {
