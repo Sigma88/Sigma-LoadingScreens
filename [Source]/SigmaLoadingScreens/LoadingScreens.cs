@@ -9,32 +9,32 @@ namespace Sigma88LoadingScreensPlugin
 {
     internal static class LoadingScreens
     {
-        internal static void LoadBuiltIn(string[] mods)
-        {
-            if (LoadingScreenSettings.newScreens == null)
-                LoadingScreenSettings.newScreens = new List<Object>();
-            if (LoadingScreenSettings.newTips == null)
-                LoadingScreenSettings.newTips = new List<string>();
+        //internal static void LoadBuiltIn(string[] mods)
+        //{
+        //    if (LoadingScreenSettings.newScreens == null)
+        //        LoadingScreenSettings.newScreens = new List<Object>();
+        //    if (LoadingScreenSettings.newTips == null)
+        //        LoadingScreenSettings.newTips = new List<string>();
 
-            if (mods.Contains("GalacticNeighborhood"))
-            {
-                Debug.Log("LoadBuiltIn", "GN detected");
-                LoadingScreenSettings.newScreens.AddRange(LoadScreens("GalacticNeighborhood/LoadingScreens/PluginData/"));
-                LoadingScreenSettings.newTips.Add("Populating Star Systems...");
-            }
-            if (mods.Contains("SigmaBinary"))
-            {
-                Debug.Log("LoadBuiltIn", "SB detected");
-                LoadingScreenSettings.newScreens.AddRange(LoadScreens("Sigma/Binary/LoadingScreens/PluginData/"));
-                LoadingScreenSettings.newTips.Add("Re-centering Barycenters...");
-            }
-            if (mods.Contains("SigmaDimensions"))
-            {
-                Debug.Log("LoadBuiltIn", "SD detected");
-                LoadingScreenSettings.newScreens.AddRange(LoadScreens("Sigma/Dimensions/LoadingScreens/PluginData/"));
-                LoadingScreenSettings.newTips.Add("Scrambling Universal Constants...");
-            }
-        }
+        //    if (mods.Contains("GalacticNeighborhood"))
+        //    {
+        //        Debug.Log("LoadBuiltIn", "GN detected");
+        //        LoadingScreenSettings.newScreens.AddRange(LoadScreens("GalacticNeighborhood/LoadingScreens/PluginData/"));
+        //        LoadingScreenSettings.newTips.Add("Populating Star Systems...");
+        //    }
+        //    if (mods.Contains("SigmaBinary"))
+        //    {
+        //        Debug.Log("LoadBuiltIn", "SB detected");
+        //        LoadingScreenSettings.newScreens.AddRange(LoadScreens("Sigma/Binary/LoadingScreens/PluginData/"));
+        //        LoadingScreenSettings.newTips.Add("Re-centering Barycenters...");
+        //    }
+        //    if (mods.Contains("SigmaDimensions"))
+        //    {
+        //        Debug.Log("LoadBuiltIn", "SD detected");
+        //        LoadingScreenSettings.newScreens.AddRange(LoadScreens("Sigma/Dimensions/LoadingScreens/PluginData/"));
+        //        LoadingScreenSettings.newTips.Add("Scrambling Universal Constants...");
+        //    }
+        //}
 
         internal static void LoadExternal(UrlDir.UrlConfig[] config)
         {
@@ -131,7 +131,9 @@ namespace Sigma88LoadingScreensPlugin
 
             screens.AddRange(LoadingScreenSettings.newScreens);
             screens.Scramble();
-            screen.screens = screens.ToArray();
+
+            PseudoRandom.Add(screens.ToArray());
+            screen.screens = PseudoRandom.states[PseudoRandom.state].ToArray();
             Debug.Log("AddScreens", "Final count of Loading Screen Images = " + screen.screens.Length);
 
 
@@ -185,7 +187,9 @@ namespace Sigma88LoadingScreensPlugin
                 Debug.Log("AddLogo", "Added to list new logo pair: image = " + logoScreen + ", tip = " + LoadingScreenSettings.logos.Last().Value);
             }
             else
+            {
                 Debug.Log("AddLogo", "logo is null");
+            }
         }
 
         static Object[] LoadScreens(string path)
