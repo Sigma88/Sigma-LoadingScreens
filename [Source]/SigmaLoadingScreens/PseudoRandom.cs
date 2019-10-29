@@ -21,11 +21,11 @@ namespace Sigma88LoadingScreensPlugin
             if (states[state].Contains(obj))
             {
                 states[state].Remove(obj);
-                states[state + 2 % 3].Add(obj);
+                states[(state + 2) % 3].Add(obj);
 
                 if (states[state].Count == 0)
                 {
-                    state = state + 1 % 3;
+                    state = (state + 1) % 3;
                 }
             }
         }
@@ -35,7 +35,7 @@ namespace Sigma88LoadingScreensPlugin
             if (objects.Length > 1)
             {
                 states[0] = objects.Take(objects.Length / 2).ToList();
-                states[1] = objects.Except(states[0]).ToList();
+                states[1] = objects.Skip(objects.Length / 2).ToList();
             }
         }
     }
