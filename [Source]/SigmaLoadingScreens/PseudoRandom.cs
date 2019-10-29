@@ -32,10 +32,18 @@ namespace Sigma88LoadingScreensPlugin
 
         internal static void Add(Object[] objects)
         {
-            if (objects.Length > 1)
+            if (objects?.Length > 0)
             {
-                states[0] = objects.Take(objects.Length / 2).ToList();
-                states[1] = objects.Skip(objects.Length / 2).ToList();
+                if (objects?.Length == 1)
+                {
+                    states[0] = objects.ToList();
+                    states[1] = objects.ToList();
+                }
+                else
+                {
+                    states[0] = objects.Take(objects.Length / 2).ToList();
+                    states[1] = objects.Skip(objects.Length / 2).ToList();
+                }
             }
         }
     }
