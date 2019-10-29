@@ -67,8 +67,8 @@ namespace Sigma88LoadingScreensPlugin
             {
                 skip = true;
                 Debug.Log("Settings", "Loaded assembly location = " + Assembly.GetExecutingAssembly().Location);
-                //Debug.Log("Settings", "Checking for BuiltIn mods...");
-                //LoadingScreens.LoadBuiltIn(AssemblyLoader.loadedAssemblies.Select(a => a.name).ToArray());
+                Debug.Log("Settings", "Checking for BuiltIn mods...");
+                LoadingScreens.LoadBuiltIn(AssemblyLoader.loadedAssemblies.Select(a => a.name).ToArray());
                 Debug.Log("Settings", "Checking for External mods...");
                 LoadingScreens.LoadExternal(SettingsNodes);
                 Debug.Log("Settings", "Applying Settings to LoadingScreen");
