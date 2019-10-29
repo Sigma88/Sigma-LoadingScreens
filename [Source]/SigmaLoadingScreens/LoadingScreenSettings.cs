@@ -91,10 +91,10 @@ namespace Sigma88LoadingScreensPlugin
                 {
                     Debug.Log("Settings", "Loading screen image has changed");
 
-                    Debug.Log("Settings", "previous image = " + lastScreen.name);
+                    Debug.Log("Settings", "previous image = " + lastScreen?.name);
                     lastScreen = screen.activeScreen;
-                    Debug.Log("Settings", "current image = " + lastScreen.name);
-                    
+                    Debug.Log("Settings", "current image = " + lastScreen?.name);
+
                     PseudoRandom.Choose(lastScreen);
                     screen.screens = PseudoRandom.states[PseudoRandom.state].ToArray();
 
@@ -107,9 +107,9 @@ namespace Sigma88LoadingScreensPlugin
                         {
                             Debug.Log("Settings", "Loading screen theme has changed");
 
-                            Debug.Log("Settings", "previous theme = " + lastTheme ?? "null");
+                            Debug.Log("Settings", "previous theme = " + lastTheme);
                             lastTheme = theme;
-                            Debug.Log("Settings", "current theme = " + lastTheme ?? "null");
+                            Debug.Log("Settings", "current theme = " + lastTheme);
 
                             Debug.Log("Settings", "previous tip count = " + screen?.tips?.Length);
                             screen.tips = theme == null ? newTips.ToArray() : themes[(int)theme].Value;
