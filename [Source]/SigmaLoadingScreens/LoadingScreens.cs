@@ -58,7 +58,7 @@ namespace Sigma88LoadingScreensPlugin
                     LoadingScreenSettings.removeStockScreens = true;
                     Debug.Log("LoadExternal", "'removeStockScreens' set to 'true'");
                 }
-                LoadingScreenSettings.newScreens.AddRange(screens);
+                //LoadingScreenSettings.newScreens.AddRange(screens);
 
 
                 // Loading Tips
