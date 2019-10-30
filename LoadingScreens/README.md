@@ -11,3 +11,4 @@ Latest Release: https://github.com/Sigma88/Sigma-LoadingScreens/releases/latest
 
 - Sigma Binary
 - Sigma Dimensions
+- Galactic Neighborhood
