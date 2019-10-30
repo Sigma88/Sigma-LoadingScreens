@@ -83,9 +83,9 @@ namespace Sigma88LoadingScreensPlugin
                 }
             }
 
-            if (LoadingScreen.Instance?.Screens?.ElementAt(logos?.Count > 0 ? LoadingScreen.Instance.Screens.Count - 1 : LoadingScreen.Instance.Screens.Count - 1)?.activeScreen != null)
+            if (LoadingScreen.Instance?.Screens?.LastOrDefault()?.activeScreen != null)
             {
-                LoadingScreen.LoadingScreenState screen = LoadingScreen.Instance.Screens.ElementAt(logos?.Count > 0 ? LoadingScreen.Instance.Screens.Count - 1 : LoadingScreen.Instance.Screens.Count - 1);
+                LoadingScreen.LoadingScreenState screen = LoadingScreen.Instance?.Screens?.LastOrDefault();
 
                 if (lastScreen != screen.activeScreen)
                 {
