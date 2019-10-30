@@ -1,3 +1,9 @@
+**v0.5.0**
+
+- Updated to KSP 1.8.1
+- Improved loading screens randomization
+
+
 **v0.4.0**
 
 - Updated to KSP 1.4.3
