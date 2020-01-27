@@ -97,14 +97,21 @@ namespace Sigma88LoadingScreensPlugin
         internal static void AddScreens(LoadingScreen.LoadingScreenState screen)
         {
             Debug.Log("AddScreens", "Adding ");
-            Directory.CreateDirectory("Logs/SigmaLoadingScreens/");
+
+            if (Debug.debug)
+            {
+                Directory.CreateDirectory("Logs/Sigma88LoadingScreens/");
+            }
 
             // Loading Screens
             List<Object> screens = screen?.screens?.ToList();
             if (screens == null)
                 screens = new List<Object>();
 
-            File.WriteAllLines("Logs/SigmaLoadingScreens/1 - StockScreens.txt", screens.Select(s => s.name));
+            if (Debug.debug)
+            {
+                File.WriteAllLines("Logs/Sigma88LoadingScreens/1 - StockScreens.txt", screens.Select(s => s.name));
+            }
 
             if (LoadingScreenSettings.removeStockScreens)
             {
@@ -112,14 +119,24 @@ namespace Sigma88LoadingScreensPlugin
                 Debug.Log("AddScreens", "Removed Stock Loading Screen Images");
             }
 
-            File.WriteAllLines("Logs/SigmaLoadingScreens/2 - NewScreens.txt", LoadingScreenSettings.newScreens.Select(s => s.name));
+            if (Debug.debug)
+            {
+                File.WriteAllLines("Logs/Sigma88LoadingScreens/2 - NewScreens.txt", LoadingScreenSettings.newScreens.Select(s => s.name));
+            }
 
             screens.AddUniqueRange(LoadingScreenSettings.newScreens);
 
-            File.WriteAllText("Logs/SigmaLoadingScreens/3 - SkippedScreens.txt", "");
+            if (Debug.debug)
+            {
+                File.WriteAllText("Logs/Sigma88LoadingScreens/3 - SkippedScreens.txt", "");
+            }
+
             if (LoadingScreenSettings.skipScreens?.Length > 0)
             {
-                File.WriteAllLines("Logs/SigmaLoadingScreens/3 - SkippedScreens.txt", LoadingScreenSettings.skipScreens);
+                if (Debug.debug)
+                {
+                    File.WriteAllLines("Logs/Sigma88LoadingScreens/3 - SkippedScreens.txt", LoadingScreenSettings.skipScreens);
+                }
 
                 for (int i = 0; i < LoadingScreenSettings.skipScreens.Length; i++)
                 {
@@ -132,7 +149,11 @@ namespace Sigma88LoadingScreensPlugin
                 }
             }
 
-            File.WriteAllLines("Logs/SigmaLoadingScreens/4 - ValidScreens.txt", screens.Select(s => s.name));
+            if (Debug.debug)
+            {
+                File.WriteAllLines("Logs/Sigma88LoadingScreens/4 - ValidScreens.txt", screens.Select(s => s.name));
+            }
+
             screens.Scramble();
             Debug.Log("AddScreens", "Final count of Loading Screen Images = " + screen.screens.Length);
 
