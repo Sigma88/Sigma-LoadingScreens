@@ -18,21 +18,22 @@ namespace Sigma88LoadingScreensPlugin
 
         // Loading Screens
         public static bool removeStockScreens = false;
-        public static List<string> externalMods = new List<string>();
-        public static List<Object> newScreens = new List<Object>();
+        public static string[] skipScreens;
+        public static List<string> externalMods;
+        public static List<Object> newScreens;
 
         // Loading Tips
         public static bool removeStockTips = false;
-        public static List<string> externalTipFiles = new List<string>();
-        public static List<string> newTips = new List<string>();
+        public static List<string> externalTipFiles;
+        public static List<string> newTips;
 
         // Logo
-        public static List<KeyValuePair<Texture2D, string>> logos = new List<KeyValuePair<Texture2D, string>>();
+        public static List<KeyValuePair<Texture2D, string>> logos;
 
         // Themes
         static int? lastTheme = null;
         static Object lastScreen = null;
-        public static List<KeyValuePair<Object[], string[]>> themes = new List<KeyValuePair<Object[], string[]>>();
+        public static List<KeyValuePair<Object[], string[]>> themes;
 
         void Awake()
         {
@@ -40,9 +41,18 @@ namespace Sigma88LoadingScreensPlugin
             TheChosenOne = list.FirstOrDefault(a => a.assembly.GetName().Version == list.Select(i => i.assembly.GetName().Version).Max());
             if (first && Assembly.GetExecutingAssembly() == TheChosenOne.assembly)
             {
+                // Awake
                 Version.Print();
                 first = false;
                 DontDestroyOnLoad(this);
+
+                // Default Values
+                externalMods = new List<string>();
+                newScreens = new List<Object>();
+                externalTipFiles = new List<string>();
+                newTips = new List<string>();
+                logos = new List<KeyValuePair<Texture2D, string>>();
+                themes = new List<KeyValuePair<Object[], string[]>>();
             }
             else
             {

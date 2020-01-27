@@ -14,25 +14,6 @@ namespace Sigma88LoadingScreensPlugin
                 LoadingScreenSettings.newScreens = new List<Object>();
             if (LoadingScreenSettings.newTips == null)
                 LoadingScreenSettings.newTips = new List<string>();
-
-            if (mods.Contains("GalacticNeighborhood"))
-            {
-                Debug.Log("LoadBuiltIn", "GN detected");
-                LoadingScreenSettings.newScreens.AddRange(LoadScreens("GalacticNeighborhood/LoadingScreens/PluginData/"));
-                LoadingScreenSettings.newTips.Add("Populating Star Systems...");
-            }
-            if (mods.Contains("SigmaBinary"))
-            {
-                Debug.Log("LoadBuiltIn", "SB detected");
-                LoadingScreenSettings.newScreens.AddRange(LoadScreens("Sigma/Binary/LoadingScreens/PluginData/"));
-                LoadingScreenSettings.newTips.Add("Re-centering Barycenters...");
-            }
-            if (mods.Contains("SigmaDimensions"))
-            {
-                Debug.Log("LoadBuiltIn", "SD detected");
-                LoadingScreenSettings.newScreens.AddRange(LoadScreens("Sigma/Dimensions/LoadingScreens/PluginData/"));
-                LoadingScreenSettings.newTips.Add("Scrambling Universal Constants...");
-            }
         }
 
         internal static void LoadExternal(UrlDir.UrlConfig[] config)
@@ -58,6 +39,7 @@ namespace Sigma88LoadingScreensPlugin
                     LoadingScreenSettings.removeStockScreens = true;
                     Debug.Log("LoadExternal", "'removeStockScreens' set to 'true'");
                 }
+                LoadingScreenSettings.skipScreens = node.GetValues("skip") ?? new string[0];
 
 
                 // Loading Tips
@@ -115,11 +97,14 @@ namespace Sigma88LoadingScreensPlugin
         internal static void AddScreens(LoadingScreen.LoadingScreenState screen)
         {
             Debug.Log("AddScreens", "Adding ");
+            Directory.CreateDirectory("Logs/SigmaLoadingScreens/");
 
             // Loading Screens
             List<Object> screens = screen?.screens?.ToList();
             if (screens == null)
                 screens = new List<Object>();
+
+            File.WriteAllLines("Logs/SigmaLoadingScreens/1 - StockScreens.txt", screens.Select(s => s.name));
 
             if (LoadingScreenSettings.removeStockScreens)
             {
@@ -127,12 +112,29 @@ namespace Sigma88LoadingScreensPlugin
                 Debug.Log("AddScreens", "Removed Stock Loading Screen Images");
             }
 
+            File.WriteAllLines("Logs/SigmaLoadingScreens/2 - NewScreens.txt", LoadingScreenSettings.newScreens.Select(s => s.name));
+
             screens.AddRange(LoadingScreenSettings.newScreens);
+
+            File.WriteAllLines("Logs/SigmaLoadingScreens/3 - SkippedScreens.txt", LoadingScreenSettings.skipScreens);
+
+            for (int i = 0; i < LoadingScreenSettings.skipScreens.Length; i++)
+            {
+                string screenName = LoadingScreenSettings.skipScreens[i];
+                Object skipScreen = screens.FirstOrDefault(o => o.name == screenName);
+                if (skipScreen != null)
+                {
+                    screens.Remove(skipScreen);
+                }
+            }
+
+            File.WriteAllLines("Logs/SigmaLoadingScreens/4 - ValidScreens.txt", LoadingScreenSettings.skipScreens);
+
             screens.Scramble();
+            Debug.Log("AddScreens", "Final count of Loading Screen Images = " + screen.screens.Length);
 
             PseudoRandom.Add(screens.ToArray());
             screen.screens = PseudoRandom.states[PseudoRandom.state].ToArray();
-            Debug.Log("AddScreens", "Final count of Loading Screen Images = " + screen.screens.Length);
 
 
             // Loading Tips
@@ -141,7 +143,7 @@ namespace Sigma88LoadingScreensPlugin
 
             if (LoadingScreenSettings.removeStockTips)
             {
-                Debug.Log("AddScreens", "Removed Stock Loading Screen Images");
+                Debug.Log("AddScreens", "Removed Stock Loading Screen Tips");
             }
             else if (screen.tips?.Length > 0)
             {
