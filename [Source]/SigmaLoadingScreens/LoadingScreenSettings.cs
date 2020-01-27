@@ -18,7 +18,7 @@ namespace Sigma88LoadingScreensPlugin
 
         // Loading Screens
         public static bool removeStockScreens = false;
-        public static string[] skipScreens;
+        public static List<string> skipScreens;
         public static List<string> externalMods;
         public static List<Object> newScreens;
 
@@ -47,6 +47,7 @@ namespace Sigma88LoadingScreensPlugin
                 DontDestroyOnLoad(this);
 
                 // Default Values
+                skipScreens = new List<string>();
                 externalMods = new List<string>();
                 newScreens = new List<Object>();
                 externalTipFiles = new List<string>();

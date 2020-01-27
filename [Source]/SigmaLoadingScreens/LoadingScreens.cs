@@ -39,7 +39,7 @@ namespace Sigma88LoadingScreensPlugin
                     LoadingScreenSettings.removeStockScreens = true;
                     Debug.Log("LoadExternal", "'removeStockScreens' set to 'true'");
                 }
-                LoadingScreenSettings.skipScreens = node.GetValues("skip");
+                LoadingScreenSettings.skipScreens.AddUniqueRange(node.GetValues("skip"));
 
 
                 // Loading Tips
@@ -131,14 +131,14 @@ namespace Sigma88LoadingScreensPlugin
                 File.WriteAllText("Logs/Sigma88LoadingScreens/3 - SkippedScreens.txt", "");
             }
 
-            if (LoadingScreenSettings.skipScreens?.Length > 0)
+            if (LoadingScreenSettings.skipScreens?.Count > 0)
             {
                 if (Debug.debug)
                 {
                     File.WriteAllLines("Logs/Sigma88LoadingScreens/3 - SkippedScreens.txt", LoadingScreenSettings.skipScreens);
                 }
 
-                for (int i = 0; i < LoadingScreenSettings.skipScreens.Length; i++)
+                for (int i = 0; i < LoadingScreenSettings.skipScreens.Count; i++)
                 {
                     string screenName = LoadingScreenSettings.skipScreens[i];
                     Object skipScreen = screens.FirstOrDefault(o => o.name == screenName);
