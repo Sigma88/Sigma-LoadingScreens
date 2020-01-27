@@ -4,10 +4,3 @@
 
 
 Latest Release: https://github.com/Sigma88/Sigma-LoadingScreens/releases/latest
-
-
-
-### Built-in support for:
-
-- Sigma Binary
-- Sigma Dimensions

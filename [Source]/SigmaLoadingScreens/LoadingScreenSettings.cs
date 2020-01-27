@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 
 namespace Sigma88LoadingScreensPlugin
@@ -19,21 +18,22 @@ namespace Sigma88LoadingScreensPlugin
 
         // Loading Screens
         public static bool removeStockScreens = false;
-        public static List<string> externalMods = new List<string>();
-        public static List<Object> newScreens = new List<Object>();
+        public static List<string> skipScreens;
+        public static List<string> externalMods;
+        public static List<Object> newScreens;
 
         // Loading Tips
         public static bool removeStockTips = false;
-        public static List<string> externalTipFiles = new List<string>();
-        public static List<string> newTips = new List<string>();
+        public static List<string> externalTipFiles;
+        public static List<string> newTips;
 
         // Logo
-        public static List<KeyValuePair<Texture2D, string>> logos = new List<KeyValuePair<Texture2D, string>>();
+        public static List<KeyValuePair<Texture2D, string>> logos;
 
         // Themes
         static int? lastTheme = null;
         static Object lastScreen = null;
-        public static List<KeyValuePair<Object[], string[]>> themes = new List<KeyValuePair<Object[], string[]>>();
+        public static List<KeyValuePair<Object[], string[]>> themes;
 
         void Awake()
         {
@@ -41,9 +41,19 @@ namespace Sigma88LoadingScreensPlugin
             TheChosenOne = list.FirstOrDefault(a => a.assembly.GetName().Version == list.Select(i => i.assembly.GetName().Version).Max());
             if (first && Assembly.GetExecutingAssembly() == TheChosenOne.assembly)
             {
+                // Awake
                 Version.Print();
                 first = false;
                 DontDestroyOnLoad(this);
+
+                // Default Values
+                skipScreens = new List<string>();
+                externalMods = new List<string>();
+                newScreens = new List<Object>();
+                externalTipFiles = new List<string>();
+                newTips = new List<string>();
+                logos = new List<KeyValuePair<Texture2D, string>>();
+                themes = new List<KeyValuePair<Object[], string[]>>();
             }
             else
             {
@@ -84,34 +94,40 @@ namespace Sigma88LoadingScreensPlugin
                 }
             }
 
-            if (themes?.Count() > 0 && LoadingScreen.Instance?.Screens?.ElementAt(logos?.Count > 0 ? LoadingScreen.Instance.Screens.Count - 1 : LoadingScreen.Instance.Screens.Count - 2)?.activeScreen != null)
+            if (LoadingScreen.Instance?.Screens?.LastOrDefault()?.activeScreen != null)
             {
-                LoadingScreen.LoadingScreenState screen = LoadingScreen.Instance.Screens.ElementAt(logos?.Count > 0 ? LoadingScreen.Instance.Screens.Count - 1 : LoadingScreen.Instance.Screens.Count - 2);
+                LoadingScreen.LoadingScreenState screen = LoadingScreen.Instance?.Screens?.LastOrDefault();
 
                 if (lastScreen != screen.activeScreen)
                 {
                     Debug.Log("Settings", "Loading screen image has changed");
 
-                    Debug.Log("Settings", "previous image = " + lastScreen.name);
+                    Debug.Log("Settings", "previous image = " + lastScreen?.name);
                     lastScreen = screen.activeScreen;
-                    Debug.Log("Settings", "current image = " + lastScreen.name);
+                    Debug.Log("Settings", "current image = " + lastScreen?.name);
 
-                    int? theme = null;
-                    try { theme = themes.FindIndex(t => t.Key?.Contains(screen?.activeScreen) == true); } catch { }
+                    PseudoRandom.Choose(lastScreen);
+                    screen.screens = PseudoRandom.states[PseudoRandom.state].ToArray();
 
-                    if (lastTheme != theme)
+                    if (themes?.Count() > 0)
                     {
-                        Debug.Log("Settings", "Loading screen theme has changed");
+                        int? theme = null;
+                        try { theme = themes.FindIndex(t => t.Key?.Contains(screen?.activeScreen) == true); } catch { }
 
-                        Debug.Log("Settings", "previous theme = " + lastTheme ?? "null");
-                        lastTheme = theme;
-                        Debug.Log("Settings", "current theme = " + lastTheme ?? "null");
+                        if (lastTheme != theme)
+                        {
+                            Debug.Log("Settings", "Loading screen theme has changed");
 
-                        Debug.Log("Settings", "previous tip count = " + screen?.tips?.Length);
-                        screen.tips = theme == null ? newTips.ToArray() : themes[(int)theme].Value;
-                        Debug.Log("Settings", "current tip count = " + screen?.tips?.Length);
+                            Debug.Log("Settings", "previous theme = " + lastTheme);
+                            lastTheme = theme;
+                            Debug.Log("Settings", "current theme = " + lastTheme);
 
-                        LoadingScreen.Instance.SetTip(screen);
+                            Debug.Log("Settings", "previous tip count = " + screen?.tips?.Length);
+                            screen.tips = theme == null ? newTips.ToArray() : themes[(int)theme].Value;
+                            Debug.Log("Settings", "current tip count = " + screen?.tips?.Length);
+
+                            LoadingScreen.Instance.SetTip(screen);
+                        }
                     }
                 }
             }

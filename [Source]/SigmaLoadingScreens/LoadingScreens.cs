@@ -2,7 +2,6 @@
 using System.IO;
 using System.Linq;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 
 namespace Sigma88LoadingScreensPlugin
@@ -15,25 +14,6 @@ namespace Sigma88LoadingScreensPlugin
                 LoadingScreenSettings.newScreens = new List<Object>();
             if (LoadingScreenSettings.newTips == null)
                 LoadingScreenSettings.newTips = new List<string>();
-
-            if (mods.Contains("GalacticNeighborhood"))
-            {
-                Debug.Log("LoadBuiltIn", "GN detected");
-                LoadingScreenSettings.newScreens.AddRange(LoadScreens("GalacticNeighborhood/LoadingScreens/PluginData/"));
-                LoadingScreenSettings.newTips.Add("Populating Star Systems...");
-            }
-            if (mods.Contains("SigmaBinary"))
-            {
-                Debug.Log("LoadBuiltIn", "SB detected");
-                LoadingScreenSettings.newScreens.AddRange(LoadScreens("Sigma/Binary/LoadingScreens/PluginData/"));
-                LoadingScreenSettings.newTips.Add("Re-centering Barycenters...");
-            }
-            if (mods.Contains("SigmaDimensions"))
-            {
-                Debug.Log("LoadBuiltIn", "SD detected");
-                LoadingScreenSettings.newScreens.AddRange(LoadScreens("Sigma/Dimensions/LoadingScreens/PluginData/"));
-                LoadingScreenSettings.newTips.Add("Scrambling Universal Constants...");
-            }
         }
 
         internal static void LoadExternal(UrlDir.UrlConfig[] config)
@@ -59,7 +39,7 @@ namespace Sigma88LoadingScreensPlugin
                     LoadingScreenSettings.removeStockScreens = true;
                     Debug.Log("LoadExternal", "'removeStockScreens' set to 'true'");
                 }
-                LoadingScreenSettings.newScreens.AddRange(screens);
+                LoadingScreenSettings.skipScreens.AddUniqueRange(node.GetValues("skip"));
 
 
                 // Loading Tips
@@ -118,10 +98,20 @@ namespace Sigma88LoadingScreensPlugin
         {
             Debug.Log("AddScreens", "Adding ");
 
+            if (Debug.debug)
+            {
+                Directory.CreateDirectory("Logs/Sigma88LoadingScreens/");
+            }
+
             // Loading Screens
             List<Object> screens = screen?.screens?.ToList();
             if (screens == null)
                 screens = new List<Object>();
+
+            if (Debug.debug)
+            {
+                File.WriteAllLines("Logs/Sigma88LoadingScreens/1 - StockScreens.txt", screens.Select(s => s.name));
+            }
 
             if (LoadingScreenSettings.removeStockScreens)
             {
@@ -129,10 +119,46 @@ namespace Sigma88LoadingScreensPlugin
                 Debug.Log("AddScreens", "Removed Stock Loading Screen Images");
             }
 
-            screens.AddRange(LoadingScreenSettings.newScreens);
+            if (Debug.debug)
+            {
+                File.WriteAllLines("Logs/Sigma88LoadingScreens/2 - NewScreens.txt", LoadingScreenSettings.newScreens.Select(s => s.name));
+            }
+
+            screens.AddUniqueRange(LoadingScreenSettings.newScreens);
+
+            if (Debug.debug)
+            {
+                File.WriteAllText("Logs/Sigma88LoadingScreens/3 - SkippedScreens.txt", "");
+            }
+
+            if (LoadingScreenSettings.skipScreens?.Count > 0)
+            {
+                if (Debug.debug)
+                {
+                    File.WriteAllLines("Logs/Sigma88LoadingScreens/3 - SkippedScreens.txt", LoadingScreenSettings.skipScreens);
+                }
+
+                for (int i = 0; i < LoadingScreenSettings.skipScreens.Count; i++)
+                {
+                    string screenName = LoadingScreenSettings.skipScreens[i];
+                    Object skipScreen = screens.FirstOrDefault(o => o.name == screenName);
+                    if (skipScreen != null)
+                    {
+                        screens.Remove(skipScreen);
+                    }
+                }
+            }
+
+            if (Debug.debug)
+            {
+                File.WriteAllLines("Logs/Sigma88LoadingScreens/4 - ValidScreens.txt", screens.Select(s => s.name));
+            }
+
             screens.Scramble();
-            screen.screens = screens.ToArray();
             Debug.Log("AddScreens", "Final count of Loading Screen Images = " + screen.screens.Length);
+
+            PseudoRandom.Add(screens.ToArray());
+            screen.screens = PseudoRandom.states[PseudoRandom.state].ToArray();
 
 
             // Loading Tips
@@ -141,7 +167,7 @@ namespace Sigma88LoadingScreensPlugin
 
             if (LoadingScreenSettings.removeStockTips)
             {
-                Debug.Log("AddScreens", "Removed Stock Loading Screen Images");
+                Debug.Log("AddScreens", "Removed Stock Loading Screen Tips");
             }
             else if (screen.tips?.Length > 0)
             {
@@ -185,7 +211,9 @@ namespace Sigma88LoadingScreensPlugin
                 Debug.Log("AddLogo", "Added to list new logo pair: image = " + logoScreen + ", tip = " + LoadingScreenSettings.logos.Last().Value);
             }
             else
+            {
                 Debug.Log("AddLogo", "logo is null");
+            }
         }
 
         static Object[] LoadScreens(string path)

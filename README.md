@@ -106,3 +106,11 @@ These nodes cannot be edited using
     
     If no "logoTip" is defined, the default will not be used.
     ```
+
+  - **skip**, *\<string\>*, The name of the loading screen skip.
+
+    ```
+    This specifies the names of the loading screens that should be skipped.
+    
+    You can have as many "skip" lines in each node. All will be loaded.
+    ```
