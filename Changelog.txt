@@ -3,6 +3,7 @@
 - Updated to KSP 1.8.1
 - Improved loading screens randomization
 - Added ability to skip specific screens
+- Removed builtin support for other mods
 
 
 **v0.4.0**
