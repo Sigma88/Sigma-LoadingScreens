@@ -2,7 +2,6 @@
 using System.IO;
 using System.Linq;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 
 namespace Sigma88LoadingScreensPlugin
@@ -59,7 +58,6 @@ namespace Sigma88LoadingScreensPlugin
                     LoadingScreenSettings.removeStockScreens = true;
                     Debug.Log("LoadExternal", "'removeStockScreens' set to 'true'");
                 }
-                LoadingScreenSettings.newScreens.AddRange(screens);
 
 
                 // Loading Tips
@@ -131,7 +129,9 @@ namespace Sigma88LoadingScreensPlugin
 
             screens.AddRange(LoadingScreenSettings.newScreens);
             screens.Scramble();
-            screen.screens = screens.ToArray();
+
+            PseudoRandom.Add(screens.ToArray());
+            screen.screens = PseudoRandom.states[PseudoRandom.state].ToArray();
             Debug.Log("AddScreens", "Final count of Loading Screen Images = " + screen.screens.Length);
 
 
@@ -185,7 +185,9 @@ namespace Sigma88LoadingScreensPlugin
                 Debug.Log("AddLogo", "Added to list new logo pair: image = " + logoScreen + ", tip = " + LoadingScreenSettings.logos.Last().Value);
             }
             else
+            {
                 Debug.Log("AddLogo", "logo is null");
+            }
         }
 
         static Object[] LoadScreens(string path)

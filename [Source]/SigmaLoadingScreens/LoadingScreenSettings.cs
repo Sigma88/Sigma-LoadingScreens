@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 
 namespace Sigma88LoadingScreensPlugin
@@ -84,34 +83,40 @@ namespace Sigma88LoadingScreensPlugin
                 }
             }
 
-            if (themes?.Count() > 0 && LoadingScreen.Instance?.Screens?.ElementAt(logos?.Count > 0 ? LoadingScreen.Instance.Screens.Count - 1 : LoadingScreen.Instance.Screens.Count - 2)?.activeScreen != null)
+            if (LoadingScreen.Instance?.Screens?.LastOrDefault()?.activeScreen != null)
             {
-                LoadingScreen.LoadingScreenState screen = LoadingScreen.Instance.Screens.ElementAt(logos?.Count > 0 ? LoadingScreen.Instance.Screens.Count - 1 : LoadingScreen.Instance.Screens.Count - 2);
+                LoadingScreen.LoadingScreenState screen = LoadingScreen.Instance?.Screens?.LastOrDefault();
 
                 if (lastScreen != screen.activeScreen)
                 {
                     Debug.Log("Settings", "Loading screen image has changed");
 
-                    Debug.Log("Settings", "previous image = " + lastScreen.name);
+                    Debug.Log("Settings", "previous image = " + lastScreen?.name);
                     lastScreen = screen.activeScreen;
-                    Debug.Log("Settings", "current image = " + lastScreen.name);
+                    Debug.Log("Settings", "current image = " + lastScreen?.name);
 
-                    int? theme = null;
-                    try { theme = themes.FindIndex(t => t.Key?.Contains(screen?.activeScreen) == true); } catch { }
+                    PseudoRandom.Choose(lastScreen);
+                    screen.screens = PseudoRandom.states[PseudoRandom.state].ToArray();
 
-                    if (lastTheme != theme)
+                    if (themes?.Count() > 0)
                     {
-                        Debug.Log("Settings", "Loading screen theme has changed");
+                        int? theme = null;
+                        try { theme = themes.FindIndex(t => t.Key?.Contains(screen?.activeScreen) == true); } catch { }
 
-                        Debug.Log("Settings", "previous theme = " + lastTheme ?? "null");
-                        lastTheme = theme;
-                        Debug.Log("Settings", "current theme = " + lastTheme ?? "null");
+                        if (lastTheme != theme)
+                        {
+                            Debug.Log("Settings", "Loading screen theme has changed");
 
-                        Debug.Log("Settings", "previous tip count = " + screen?.tips?.Length);
-                        screen.tips = theme == null ? newTips.ToArray() : themes[(int)theme].Value;
-                        Debug.Log("Settings", "current tip count = " + screen?.tips?.Length);
+                            Debug.Log("Settings", "previous theme = " + lastTheme);
+                            lastTheme = theme;
+                            Debug.Log("Settings", "current theme = " + lastTheme);
 
-                        LoadingScreen.Instance.SetTip(screen);
+                            Debug.Log("Settings", "previous tip count = " + screen?.tips?.Length);
+                            screen.tips = theme == null ? newTips.ToArray() : themes[(int)theme].Value;
+                            Debug.Log("Settings", "current tip count = " + screen?.tips?.Length);
+
+                            LoadingScreen.Instance.SetTip(screen);
+                        }
                     }
                 }
             }
